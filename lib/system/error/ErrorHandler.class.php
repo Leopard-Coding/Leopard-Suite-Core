@@ -26,7 +26,8 @@ class ErrorHandler
 		
 		$i = 0;
 		foreach ($Trace as $Item) {
-		$ErrorTrace .= '#'.$i.' '.(isset($Item['file']) ? $Item['file'] : '<unknown file>').'('.(isset($Item['line']) ? $Item['line'] : '<unknown line>').'): '.$Item['function'].'()'."\n";
+			$ErrorTrace .= '#'.$i.' '.(isset($Item['file']) ? $Item['file'] : '<unknown file>').'('.(isset($Item['line']) ? $Item['line'] : '<unknown line>').'): '.$Item['function'].'()'."\n";
+			$i++;
 		}
 		$ErrorTrace .= '{main}';
 		$this->showError($ErrorLevel, $ErrorMessage, $ErrorFile, $ErrorLine, $ErrorTrace);

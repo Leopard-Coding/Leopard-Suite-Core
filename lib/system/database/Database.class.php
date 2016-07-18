@@ -128,7 +128,7 @@ class Database
 	 *
 	 * @return string $Num Returns number of executed datasets
 	 */
-	public static function insert($Table, array $InsertData)
+	public static function insert($Application, $Table, array $InsertData)
 	{
 		$Columns = [];
 		$Values = [];
@@ -191,7 +191,7 @@ class Database
 	 *
 	 * @return string $Num Returns number of executed datasets
 	 */
-	public static function update($Table, array $SetData, $WhereString = '', array $Additions = [])
+	public static function update($Application, $Table, array $SetData, $WhereString = '', array $Additions = [])
 	{
 		$AdditionString = self::convertAdditionArrayToString($Additions);
 		$SetString = '';
@@ -219,7 +219,7 @@ class Database
 	 *
 	 * @return string $Num Returns number of executed datasets
 	 */
-	public static function delete($Table, $WhereString = '', array $Additions = [])
+	public static function delete($Application, $Table, $WhereString = '', array $Additions = [])
 	{
 		$AdditionString = self::convertAdditionArrayToString($Additions);
 		$Query = 'DELETE FROM '.$Application.__LSC_INSTALLATION_NUMBER__.'_'.$Table.$WhereString.$AdditionString;
@@ -242,16 +242,19 @@ class Database
 	 *
 	 * @return boolean True on theoretical success, false on failure
 	 */
-	public static function createTable($Table, array $Columns, $PrimaryKey)
+	public static function createTable($Application, $Table, array $Columns, array $Keys = [])
 	{
-		if (!in_array($PrimaryKey, $Columns)) {
-			return false;
-		}
 		$ColumnString = '';
 		foreach ($Columns as $Column) {
 			$ColumnString .= $Column.', ';
 		}
-		$Query = 'CREATE TABLE '.$Application.__LSC_INSTALLATION_NUMBER__.'_'.$Table.'` ('.$ColumnString.' PRIMARY KEY (`'.$PrimaryKey.'`)) ENGINE=InnoDB DEFAULT CHARSET=utf8';
+		foreach ($Keys as $Key) {
+			$KeyString .= $Key.', ';
+		}
+		$Query = 'CREATE TABLE '.$Application.__LSC_INSTALLATION_NUMBER__.'_'.$Table.' (
+			'.$ColumnString.'
+			'.$KeyString.'
+		)';
 		self::dropTable($Table);
 		self::exec($Query);
 		
@@ -269,9 +272,9 @@ class Database
 	 *
 	 * @return void
 	 */
-	public static function dropTable($Table)
+	public static function dropTable($Application, $Table)
 	{
-		$Query = 'DROP TABLE IF EXISTS '.$Application.__LSC_INSTALLATION_NUMBER__.'_'.$Table.'`';
+		$Query = 'DROP TABLE IF EXISTS '.$Application.__LSC_INSTALLATION_NUMBER__.'_'.$Table;
 		self:exec($Query);
 		
 		return;
@@ -294,5 +297,28 @@ class Database
 		}
 		
 		return $AdditionString;
+	}
+	
+	public static function addColumns($Application, $Table, $Columns)
+	{
+		if (is_array($Columns)) {
+			foreach ($Columns as $Column) {
+				$Query = 'ALTER TABLE '.$Application.__LSC_INSTALLATION_NUMBER__.'_'.$Table.' ADD COLUMN '.$Column;
+				self:exec($Query);
+			}
+		} else {
+			$Query = 'ALTER TABLE '.$Application.__LSC_INSTALLATION_NUMBER__.'_'.$Table.' ADD COLUMN '.$Columns;
+			self:exec($Query);
+		}
+		
+		return;
+	}
+	
+	public static function addForeignKey(array $Base, array $Target $OnDelete = 'CASCADE')
+	{
+		$Query = 'ALTER TABLE '.$Base['application'].__LSC_INSTALLATION_NUMBER__.'_'.$Base['table'].' ADD FOREIGN KEY ('.$Base['column'].') REFERENCES '.$Target['application'].__LSC_INSTALLATION_NUMBER__.'_'.$Target['table'].' ('.$Target['column'].') ON DELETE '.$OnDelete;
+		self:exec($Query);
+		
+		return;
 	}
 }

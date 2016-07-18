@@ -48,4 +48,31 @@ class StringUtil
 		
 		return $String;
 	}
+	
+	public static function checkLength($String, $MinLength, $MaxLength)
+	{
+		if (strlen($String) <= $MaxLength && strlen($String) >= $MinLength) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public static function checkLength($String, $MinLength, $MaxLength)
+	{
+		if (strlen($String) <= $MaxLength && strlen($String) >= $MinLength) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public static function checkASCII($String)
+	{
+		if (mb_check_encoding($String, 'ASCII')) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 }

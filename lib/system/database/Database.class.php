@@ -9,6 +9,8 @@
  */ 
 namespace LSC\lib\system\database;
 
+use PDO;
+
 class Database
 {
 	public static $InsertId;
@@ -168,7 +170,6 @@ class Database
 				return false;
 			} 
 			$Result = self::fetchAll($Query)[0];
-			}
 		} else {
 			$Result = self::fetchAll($Query);
 		}
@@ -245,17 +246,24 @@ class Database
 	public static function createTable($Application, $Table, array $Columns, array $Keys = [])
 	{
 		$ColumnString = '';
-		foreach ($Columns as $Column) {
-			$ColumnString .= $Column.', ';
+		$KeyString = '';
+		if (count($Columns) > 0) {
+			foreach ($Columns as $Column) {
+				$ColumnString .= $Column.', ';
+			}
+			$ColumnString = substr($ColumnString, 0, -2);
 		}
-		foreach ($Keys as $Key) {
-			$KeyString .= $Key.', ';
+		if (count($Keys) > 0) {
+			foreach ($Keys as $Key) {
+				$ColumnString .= $Key.', ';
+			}
+			$KeyString = substr($KeyString, 0, -2);
 		}
 		$Query = 'CREATE TABLE '.$Application.__LSC_INSTALLATION_NUMBER__.'_'.$Table.' (
 			'.$ColumnString.'
 			'.$KeyString.'
 		)';
-		self::dropTable($Table);
+		self::dropTable($Application, $Table);
 		self::exec($Query);
 		
 		return true;
@@ -275,7 +283,7 @@ class Database
 	public static function dropTable($Application, $Table)
 	{
 		$Query = 'DROP TABLE IF EXISTS '.$Application.__LSC_INSTALLATION_NUMBER__.'_'.$Table;
-		self:exec($Query);
+		self::exec($Query);
 		
 		return;
 	}
@@ -304,20 +312,20 @@ class Database
 		if (is_array($Columns)) {
 			foreach ($Columns as $Column) {
 				$Query = 'ALTER TABLE '.$Application.__LSC_INSTALLATION_NUMBER__.'_'.$Table.' ADD COLUMN '.$Column;
-				self:exec($Query);
+				self::exec($Query);
 			}
 		} else {
 			$Query = 'ALTER TABLE '.$Application.__LSC_INSTALLATION_NUMBER__.'_'.$Table.' ADD COLUMN '.$Columns;
-			self:exec($Query);
+			self:;exec($Query);
 		}
 		
 		return;
 	}
 	
-	public static function addForeignKey(array $Base, array $Target $OnDelete = 'CASCADE')
+	public static function addForeignKey(array $Base, array $Target, $OnDelete = 'CASCADE')
 	{
 		$Query = 'ALTER TABLE '.$Base['application'].__LSC_INSTALLATION_NUMBER__.'_'.$Base['table'].' ADD FOREIGN KEY ('.$Base['column'].') REFERENCES '.$Target['application'].__LSC_INSTALLATION_NUMBER__.'_'.$Target['table'].' ('.$Target['column'].') ON DELETE '.$OnDelete;
-		self:exec($Query);
+		self::exec($Query);
 		
 		return;
 	}

@@ -36,6 +36,7 @@ class Database
 	{
 		try {
 			$Num = self::$Connection->query($Query);
+			self::$InsertId = self::$Connection->lastInsertId();
 		} catch (\PDOException $e) {
 			throw $e;
 		}
@@ -43,10 +44,15 @@ class Database
 		return $Num;
 	}
 	
-	public static function execute($Statement)
+	public static function execute($Statement, $Values = null)
 	{
 		try {
-			$Statement->execute();
+			if ($Values === null) {
+				$Statement->execute();
+			} else {
+				$Statement->execute($Values);
+			}
+			self::$InsertId = self::$Connection->lastInsertId();
 		} catch (\PDOException $e) {
 			throw $e;
 		}
@@ -87,13 +93,31 @@ class Database
 		return $String;
 	}
 	
-	public static function insert($Application, $Table)
+	public static function insert($Application, $Table, $InsertData)
 	{
+		$ColumnString = '';
+		$Values = [];
+		foreach ($InsertData as $Column => $Value) {
+			$ColumnString .= $Column.', ';
+			$Values[] = $Value;
+		}
+		$ColumnString = substr($ColumnString, 0, -2);
+		$Query = 'INSERT INTO '.$Application.__LSC_INSTALLATION_NUMBER__.'_'.$Table.' ('.$ColumnString.') VALUES (?, ?, ?)';
+		try {
+			$Statement = Database::prepare($Query);
+			Database::execute($Statement, $Values);
+		} catch (\PDOException $e) {
+			throw $e;
+		}
 		
+		return $Num;
 	}
 	
 	public static function delete($Application, $Table, $Where = '')
 	{
+		if ($Where != '') {
+			$Where = ' '.$Where;
+		}
 		$Query = 'DELETE FROM '.$Application.__LSC_INSTALLATION_NUMBER__.'_'.$Table.$Where;
 		try {
 			$Num = self::exec($Query);
@@ -106,6 +130,9 @@ class Database
 	
 	public static function select($Application, $Tables, $Where = '', $Columns = '*', $All = false)
 	{
+		if ($Where != '') {
+			$Where = ' '.$Where;
+		}
 		$Query = 'SELECT '.$Columns.' FROM '.$Application.__LSC_INSTALLATION_NUMBER__.'_'.$Table.$Where;
 		try {
 			if(!(bool) $All) {
@@ -129,6 +156,9 @@ class Database
 			$SetString .= $SetClause.', ';
 		}
 		$SetString = substr($SetString, 0, 2);
+		if ($Where != '') {
+			$Where = ' '.$Where;
+		}
 		$Query = 'UPDATE '.$Application.'_'.$Table.' SET '.$SetString.$Where;
 		try {
 			$Num = self::exec($Query);

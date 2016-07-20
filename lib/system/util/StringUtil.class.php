@@ -1,12 +1,4 @@
 <?php
-/**
- * Used to create or convert strings
- *
- * @copyright ©Leopard
- * @license http://creativecommons.org/licenses/by-nd/4.0/ CC BY-ND 4.0
- *
- * @author Julian Pfeil
- */ 
 namespace LSC\lib\system\util;
 
 class StringUtil
@@ -16,9 +8,9 @@ class StringUtil
 		$CharString = '';
 		$String = '';
 		if ($Length !== null && $MinLength === null && $MaxLength === null) {
-			$StringLength = $Length;
+			$StringLength = (int) $Length;
 		} elseif ($Length === null && $MinLength !== null && $MaxLength !== null) {
-			$StringLength = rand($MinLength, $MaxLength);
+			$StringLength = rand((int) $MinLength, (int) $MaxLength);
 		} else {
 			return false;
 		}
@@ -26,19 +18,18 @@ class StringUtil
 		$UpperCharString = 'ABCDEFGHIJKLMNOPQRSTUVXYZ';
 		$CypherString = '0123456789';
 		$SpecialCharString = '!"/()=?{[]}*+#<>|-_.:,;';
-		if ($UseLowerCharString) {
+		if ((bool) $UseLowerCharString) {
 			$CharString .= $LowerCharString;
 		}
-		if ($UseUpperCharString) {
+		if ((bool) $UseUpperCharString) {
 			$CharString .= $UpperCharString;
 		}
-		if ($UseCypherString) {
+		if ((bool) $UseCypherString) {
 			$CharString .= $CypherString;
 		}
-		if ($UseSpecialCharString) {
+		if ((bool) $UseSpecialCharString) {
 			$CharString .= $SpecialCharString;
 		}
-		
 		$CharArray = str_split($CharString);
 		$i = 0;
 		while ($i < $StringLength) {
@@ -51,7 +42,7 @@ class StringUtil
 	
 	public static function checkLength($String, $MinLength, $MaxLength)
 	{
-		if (strlen($String) <= $MaxLength && strlen($String) >= $MinLength) {
+		if (strlen($String) <= (int) $MaxLength && strlen($String) >= (int) $MinLength) {
 			return true;
 		} else {
 			return false;

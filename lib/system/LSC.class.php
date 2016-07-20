@@ -1,41 +1,57 @@
 <?php
-/**
- * Core class
- *
- * @copyright ©Leopard
- * @license http://creativecommons.org/licenses/by-nd/4.0/ CC BY-ND 4.0
- *
- * @author Julian Pfeil
- */ 
 namespace LSC\lib\system;
 
 use LSC\lib\extension\Leopard\HuntingRouter,
-	LSC\lib\system\error\ErrorHandler,
-	LSC\lib\system\autoload\AutoloadHandler;
+	LSC\lib\system\handler\ErrorHandler,
+	LSC\lib\system\handler\AutoloadingHandler,
+	LSC\lib\system\database\Database;
 
 class LSC
 {
-	private static $AutoloadHandler;
+	private static $AutoloadingHandler;
 	private static $ErrorHandler;
 	
-	public static function loadAutoloadHandler()
+	public function __construct()
 	{
-		require_once(__LSC_ABSOLUTE_DIR__.'lib/system/autoload/AutoloadHandler.class.php');
-		self::$AutoloadHandler = new AutoloadHandler;
+		self::loadAutoloadingHandler();
+		self::loadErrorHandler();
+		self::loadRouting();
+		self::connectToDatabase();
 		
 		return;
 	}
 	
-	public static function loadErrorHandler()
+	private static function loadAutoloadingHandler()
+	{
+		require_once(__LSC_ABSOLUTE_DIR__.'lib/system/handler/AutoloadingHandler.class.php');
+		self::$AutoloadingHandler = new AutoloadingHandler('LSC');
+		
+		return;
+	}
+	
+	private static function loadErrorHandler()
 	{
 		self::$ErrorHandler = new ErrorHandler;
 		
 		return;
 	}
 	
-	public static function loadRouting()
+	private static function loadRouting()
 	{
 		$Routing = HuntingRouter::startRouting();
+		define('__LSC_DIR__', HuntingRouter::getURL());
+		define('__LSC_RELATIVE_DIR__', HuntingRouter::getCurrentPath(true));
+		if (!$Routing) {
+			#404
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private static function connectToDatabase()
+	{
+		Database::connect();
 		
 		return;
 	}

@@ -1,0 +1,14 @@
+{
+  "pluginInfo": {
+    "pluginIdentifier": "com.leopard-coding.lsc",
+    "pluginVersion": "0.1.0-alpha",
+    "pluginDescription": "The Leopard Suite Core is a mighty cms with an article-system.",
+    "pluginCopyright": "Leopard-Coding",
+    "pluginAuthor": "Julian Pfeil, Christoph Ullinger",
+    "pluginWebsite": "http://www.leopard-coding.com"
+  },
+  "filesInfo": {
+    "databaseFile": "Database.json",
+    "filesDirectory": "files/"
+  }
+}

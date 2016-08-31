@@ -1,5 +1,7 @@
 <?php
 namespace LSC\lib\system\handler;
+
+use LSC\lib\system\util\FileUtil;
  
 class ErrorHandler
 {
@@ -55,7 +57,7 @@ class ErrorHandler
 		return $ErrorTrace;
 	}
 	
-	private static function getErrorId($Length = 16)
+	private static function getErrorId($Length = 8)
 	{
 		$ErrorId = '';
 		$i = 0;
@@ -63,6 +65,8 @@ class ErrorHandler
 			$ErrorId .= rand(0, 9);
 			$i++;
 		}
+		
+		return $ErrorId;
 	}
 	
 	private function showError($ErrorLevel, $ErrorMessage, $ErrorFile, $ErrorLine, $ErrorTrace)
@@ -70,6 +74,9 @@ class ErrorHandler
 		$ErrorId = self::getErrorId();
 		$ErrorOutput = '';
 		$FileName = __LSC_ABSOLUTE_DIR__.'logs/'.date('m-d-o').'.txt';
+		if (!is_dir(__LSC_ABSOLUTE_DIR__.'logs/')) {
+			FileUtil::makeDirectory(__LSC_ABSOLUTE_DIR__.'logs/');
+		}
 		if (is_writable(__LSC_ABSOLUTE_DIR__.'logs/')) {
 			$ErrorLogEntry = '['.$ErrorId.'] Error '.$ErrorLevel."\n";
 			$ErrorLogEntry .= $ErrorMessage."\n";
